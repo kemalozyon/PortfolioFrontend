@@ -39,6 +39,21 @@ const ProjectDetail = () => {
           ))}
         </div>
 
+        {(project.githubLink || project.liveDemoLink) && (
+          <div className="flex flex-wrap justify-center gap-4 mb-8">
+            {project.githubLink && (
+              <a href={project.githubLink} target="_blank" rel="noreferrer" className="px-6 py-3 bg-gray-900 dark:bg-slate-800 text-white rounded-lg hover:bg-gray-800 dark:hover:bg-slate-700 font-medium transition-colors">
+                GitHub Repository
+              </a>
+            )}
+            {project.liveDemoLink && (
+              <a href={project.liveDemoLink} target="_blank" rel="noreferrer" className="px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium transition-colors">
+                Go to Live Demo
+              </a>
+            )}
+          </div>
+        )}
+
         <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-gray-100 dark:border-slate-800 mb-8">
           <p className="text-gray-700 dark:text-slate-300 text-lg leading-relaxed">{project.description}</p>
         </div>
@@ -63,18 +78,6 @@ const ProjectDetail = () => {
           <p className="text-gray-400 dark:text-slate-600 italic">No detailed description has been added for this project yet.</p>
         )}
 
-        <div className="flex gap-4 mt-10">
-          {project.githubLink && (
-            <a href={project.githubLink} target="_blank" rel="noreferrer" className="px-6 py-3 bg-gray-900 dark:bg-slate-800 text-white rounded-lg hover:bg-gray-800 dark:hover:bg-slate-700 font-medium transition-colors">
-              GitHub Repository
-            </a>
-          )}
-          {project.liveDemoLink && (
-            <a href={project.liveDemoLink} target="_blank" rel="noreferrer" className="px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium transition-colors">
-              Go to Live Demo
-            </a>
-          )}
-        </div>
       </div>
     </div>
   );

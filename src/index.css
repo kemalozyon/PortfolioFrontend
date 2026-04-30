@@ -5,6 +5,16 @@
 /* Enable class-based dark mode — toggled by .dark on <html> */
 @variant dark (&:where(.dark, .dark *));
 
+html,
+body {
+  background-color: #f9fafb; /* gray-50 */
+}
+
+html.dark,
+html.dark body {
+  background-color: #020617; /* slate-950 */
+}
+
 @keyframes blob {
   0%, 100% { transform: translate(0px, 0px) scale(1); }
   33%       { transform: translate(40px, -60px) scale(1.15); }
