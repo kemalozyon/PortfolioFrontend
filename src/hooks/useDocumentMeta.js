@@ -27,7 +27,7 @@ function upsertLink(rel, href) {
 
 export function useDocumentMeta({ title, description, path, image, type = 'website', noindex = false }) {
   useEffect(() => {
-    const fullTitle = title ? `${title} — Kemal Ozyon` : 'Kemal Ozyon — Backend-Focused Software Developer & AI Enthusiast';
+    const fullTitle = title ? `${title} — Kemal Özyön` : 'Kemal Özyön — Backend-Focused Software Developer & AI Enthusiast';
     const canonical = path ? `${SITE_URL}${path}` : SITE_URL + '/';
     const ogImage = image || DEFAULT_IMAGE;
 

@@ -10,7 +10,7 @@ const Blogs = () => {
 
   useDocumentMeta({
     title: 'Blog',
-    description: 'Writing by Kemal Ozyon on backend engineering, APIs, AI-powered agentic systems, and software development.',
+    description: 'Writing by Kemal Özyön on backend engineering, APIs, AI-powered agentic systems, and software development.',
     path: '/blogs',
   });
 

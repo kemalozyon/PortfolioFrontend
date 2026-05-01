@@ -9,7 +9,7 @@ import { useDocumentMeta } from '../hooks/useDocumentMeta';
 const Home = () => {
     useDocumentMeta({
         title: null,
-        description: 'Personal portfolio of Kemal Ozyon — backend-focused software developer building scalable APIs, data-driven applications, and AI-powered agentic systems. Browse projects and blog posts.',
+        description: 'Personal portfolio of Kemal Özyön — backend-focused software developer building scalable APIs, data-driven applications, and AI-powered agentic systems. Browse projects and blog posts.',
         path: '/',
     });
     const [featuredProjects, setFeaturedProjects] = useState([]);
@@ -68,7 +68,7 @@ const Home = () => {
                     >
                         Hi, I'm{' '}
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-400">
-                            Kemal Ozyon
+                            Kemal Özyön
                         </span>
                     </h1>
                     <p

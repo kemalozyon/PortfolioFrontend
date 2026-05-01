@@ -10,7 +10,7 @@ const Projects = () => {
 
   useDocumentMeta({
     title: 'Projects',
-    description: 'Software projects by Kemal Ozyon — backend systems, APIs, data-driven applications, and AI-powered tools.',
+    description: 'Software projects by Kemal Özyön — backend systems, APIs, data-driven applications, and AI-powered tools.',
     path: '/projects',
   });
 

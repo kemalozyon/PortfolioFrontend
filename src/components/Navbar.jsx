@@ -59,7 +59,7 @@ const Navbar = () => {
             to="/"
             className="text-xl font-extrabold text-gray-900 dark:text-white tracking-tight"
           >
-            Kemal<span className="text-emerald-600 dark:text-emerald-400">Ozyon</span>
+            Kemal<span className="text-emerald-600 dark:text-emerald-400">Özyön</span>
           </Link>
           <ThemeToggle className="md:hidden" />
         </div>
