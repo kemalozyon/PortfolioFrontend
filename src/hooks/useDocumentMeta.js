@@ -25,7 +25,7 @@ function upsertLink(rel, href) {
   el.setAttribute('href', href);
 }
 
-export function useDocumentMeta({ title, description, path, image, type = 'website' }) {
+export function useDocumentMeta({ title, description, path, image, type = 'website', noindex = false }) {
   useEffect(() => {
     const fullTitle = title ? `${title} — Kemal Ozyon` : 'Kemal Ozyon — Backend-Focused Software Developer & AI Enthusiast';
     const canonical = path ? `${SITE_URL}${path}` : SITE_URL + '/';
@@ -34,6 +34,9 @@ export function useDocumentMeta({ title, description, path, image, type = 'websi
     document.title = fullTitle;
 
     upsertMeta('name', 'description', description);
+    upsertMeta('name', 'robots', noindex
+      ? 'noindex, follow'
+      : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1');
     upsertLink('canonical', canonical);
 
     upsertMeta('property', 'og:type', type);
@@ -45,5 +48,5 @@ export function useDocumentMeta({ title, description, path, image, type = 'websi
     upsertMeta('name', 'twitter:title', fullTitle);
     upsertMeta('name', 'twitter:description', description);
     upsertMeta('name', 'twitter:image', ogImage);
-  }, [title, description, path, image, type]);
+  }, [title, description, path, image, type, noindex]);
 }

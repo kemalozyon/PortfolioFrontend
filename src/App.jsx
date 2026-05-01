@@ -10,6 +10,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import ProjectDetail from './pages/ProjectDetail';
 import BlogDetail from './pages/BlogDetail';
+import NotFound from './pages/NotFound';
 
 function App() {
   return (
@@ -29,14 +30,17 @@ function App() {
         
         {/* Admin Rotaları */}
         <Route path="/login" element={<Login />} />
-        <Route 
-          path="/admin" 
+        <Route
+          path="/admin"
           element={
             <ProtectedRoute>
               <AdminDashboard />
             </ProtectedRoute>
-          } 
+          }
         />
+
+        {/* Catch-all 404 */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
       <Analytics />
     </BrowserRouter>
