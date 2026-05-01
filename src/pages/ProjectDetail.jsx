@@ -6,6 +6,8 @@ import rehypeSlug from 'rehype-slug';
 import axios from 'axios';
 import TableOfContents from '../components/TableOfContents';
 import CodeBlock from '../components/CodeBlock';
+import CodeLoader from '../components/CodeLoader';
+import { useDocumentMeta } from '../hooks/useDocumentMeta';
 
 const ProjectDetail = () => {
   const { id } = useParams();
@@ -19,7 +21,19 @@ const ProjectDetail = () => {
       .finally(() => setLoading(false));
   }, [id]);
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-950 dark:text-slate-300">Loading...</div>;
+  useDocumentMeta({
+    title: project?.title,
+    description: project?.description?.slice(0, 160),
+    path: `/projects/${id}`,
+    image: project?.coverImageUrl,
+    type: 'article',
+  });
+
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-950 px-6">
+      <CodeLoader label="project" />
+    </div>
+  );
   if (!project) return <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-950 dark:text-slate-300">Project not found.</div>;
 
   return (

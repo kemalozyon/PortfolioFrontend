@@ -3,8 +3,15 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { GitHubCalendar } from 'react-github-calendar';
 import HeroRain from '../components/HeroRain';
+import CodeLoader from '../components/CodeLoader';
+import { useDocumentMeta } from '../hooks/useDocumentMeta';
 
 const Home = () => {
+    useDocumentMeta({
+        title: null,
+        description: 'Personal portfolio of Kemal Ozyon — backend-focused software developer building scalable APIs, data-driven applications, and AI-powered agentic systems. Browse projects and blog posts.',
+        path: '/',
+    });
     const [featuredProjects, setFeaturedProjects] = useState([]);
     const [latestBlogs, setLatestBlogs] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -183,11 +190,8 @@ const Home = () => {
                             <Link to="/projects" className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 font-medium">See All →</Link>
                         </div>
                         {loading ? (
-                            <div className="flex justify-center py-16">
-                                <svg className="w-10 h-10 text-emerald-500 animate-spin" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                                </svg>
+                            <div className="flex justify-center py-12">
+                                <CodeLoader label="projects" compact />
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -220,11 +224,8 @@ const Home = () => {
                             <Link to="/blogs" className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 font-medium">All Posts →</Link>
                         </div>
                         {loading ? (
-                            <div className="flex justify-center py-16">
-                                <svg className="w-10 h-10 text-emerald-500 animate-spin" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                                </svg>
+                            <div className="flex justify-center py-12">
+                                <CodeLoader label="blogs" compact />
                             </div>
                         ) : (
                             <div className="space-y-4">

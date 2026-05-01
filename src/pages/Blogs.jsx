@@ -1,10 +1,18 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import CodeLoader from '../components/CodeLoader';
+import { useDocumentMeta } from '../hooks/useDocumentMeta';
 
 const Blogs = () => {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  useDocumentMeta({
+    title: 'Blog',
+    description: 'Writing by Kemal Ozyon on backend engineering, APIs, AI-powered agentic systems, and software development.',
+    path: '/blogs',
+  });
 
   useEffect(() => {
     axios.get('/api/blogs')
@@ -14,8 +22,8 @@ const Blogs = () => {
   }, []);
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-950">
-      Loading...
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-950 px-6">
+      <CodeLoader label="blogs" />
     </div>
   );
 

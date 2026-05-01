@@ -1,10 +1,18 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import CodeLoader from '../components/CodeLoader';
+import { useDocumentMeta } from '../hooks/useDocumentMeta';
 
 const Projects = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  useDocumentMeta({
+    title: 'Projects',
+    description: 'Software projects by Kemal Ozyon — backend systems, APIs, data-driven applications, and AI-powered tools.',
+    path: '/projects',
+  });
 
   useEffect(() => {
     axios.get('/api/projects')
@@ -14,8 +22,8 @@ const Projects = () => {
   }, []);
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-950">
-      Loading...
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-950 px-6">
+      <CodeLoader label="projects" />
     </div>
   );
 

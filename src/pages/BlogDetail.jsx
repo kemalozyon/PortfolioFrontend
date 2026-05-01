@@ -6,6 +6,18 @@ import remarkGfm from 'remark-gfm';
 import rehypeSlug from 'rehype-slug';
 import TableOfContents from '../components/TableOfContents';
 import CodeBlock from '../components/CodeBlock';
+import CodeLoader from '../components/CodeLoader';
+import { useDocumentMeta } from '../hooks/useDocumentMeta';
+
+const stripMarkdown = (md = '') =>
+  md
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/`[^`]*`/g, ' ')
+    .replace(/!\[[^\]]*]\([^)]*\)/g, ' ')
+    .replace(/\[([^\]]*)]\([^)]*\)/g, '$1')
+    .replace(/[#>*_~\-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 
 const BlogDetail = () => {
   const { id } = useParams();
@@ -19,7 +31,19 @@ const BlogDetail = () => {
       .finally(() => setLoading(false));
   }, [id]);
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-950 dark:text-slate-300">Loading...</div>;
+  useDocumentMeta({
+    title: blog?.title,
+    description: blog ? stripMarkdown(blog.markdownContent).slice(0, 160) : null,
+    path: `/blogs/${id}`,
+    image: blog?.coverImageURL,
+    type: 'article',
+  });
+
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-950 px-6">
+      <CodeLoader label="blog-post" />
+    </div>
+  );
   if (!blog)    return <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-950 dark:text-slate-300">Blog post not found.</div>;
 
   return (

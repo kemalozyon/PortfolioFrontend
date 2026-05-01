@@ -1,0 +1,21 @@
+{
+  "name": "Kemal Ozyon",
+  "short_name": "Kemal Ozyon",
+  "description": "Personal portfolio of Kemal Ozyon — backend-focused software developer and AI enthusiast.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#10b981",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
