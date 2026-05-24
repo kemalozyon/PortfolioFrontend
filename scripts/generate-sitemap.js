@@ -10,8 +10,8 @@ const FETCH_TIMEOUT_MS = 60_000;
 
 const STATIC_ROUTES = [
   { path: '/',         changefreq: 'monthly', priority: 1.0 },
-  { path: '/projects', changefreq: 'monthly', priority: 0.8 },
-  { path: '/blogs',    changefreq: 'weekly',  priority: 0.8 },
+  { path: '/projects', changefreq: 'monthly', priority: 0.7 },
+  { path: '/blogs',    changefreq: 'weekly',  priority: 0.7 },
 ];
 
 async function fetchJson(path) {
