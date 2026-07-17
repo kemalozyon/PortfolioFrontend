@@ -72,6 +72,17 @@ const CodeLoader = ({ label = 'data', compact = false }) => {
           <span className={`inline-block w-2 h-4 bg-emerald-400 ${showCursor ? 'opacity-100' : 'opacity-0'}`} />
         </div>
       </div>
+
+      <div className={`border-t border-slate-700/60 bg-slate-900/60 text-slate-400 leading-relaxed ${compact ? 'px-3 py-2 text-[11px]' : 'px-4 py-3 text-xs'}`}>
+        <p>
+          <span className="text-slate-500">// </span>
+          Sunucu ücretsiz bir planda çalıştığı için uykuya geçmiş olabilir; başlaması birkaç saniye sürebilir. Lütfen bekleyin.
+        </p>
+        <p className="mt-1">
+          <span className="text-slate-500">// </span>
+          The server runs on a free plan and may be asleep, so it can take a few seconds to start. Please hang tight.
+        </p>
+      </div>
     </div>
   );
 };
