@@ -11,7 +11,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://portfoliobackend-fp0u.onrender.com',
+        target: 'https://portfoliobackend-production-3611.up.railway.app',
         changeOrigin: true,
       }
     }

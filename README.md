@@ -2,7 +2,7 @@
 
 The frontend for my personal portfolio site. A React 19 single-page app that renders public pages for projects and blog posts and a JWT-protected admin dashboard for managing content.
 
-The companion backend lives in the sibling `backend/` repo and is deployed at `https://portfoliobackend-fp0u.onrender.com`. The Vite dev server proxies `/api/*` to that URL, so this app talks to real production data in development.
+The companion backend lives in the sibling `backend/` repo and is deployed at `https://portfoliobackend-production-3611.up.railway.app`. The Vite dev server proxies `/api/*` to that URL, so this app talks to real production data in development.
 
 ## Tech stack
 

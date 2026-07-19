@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const SITE_URL  = process.env.SITE_URL  || 'https://www.kemalozyon.com';
-const API_BASE  = process.env.API_BASE  || 'https://portfoliobackend-fp0u.onrender.com';
+const API_BASE  = process.env.API_BASE  || 'https://portfoliobackend-production-3611.up.railway.app';
 const DIST_DIR  = join(__dirname, '..', 'dist');
 const DEFAULT_IMAGE = `${SITE_URL}/android-chrome-512x512.png`;
 const FETCH_TIMEOUT_MS = 60_000;
