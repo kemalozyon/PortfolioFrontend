@@ -17,6 +17,9 @@ const AdminDashboard = () => {
   const [blogs, setBlogs] = useState([]);
   const [editingBlog, setEditingBlog] = useState(null);
 
+  // --- MESAJ STATE'LERİ ---
+  const [messages, setMessages] = useState([]);
+
   // --- VERİ ÇEKME FONKSİYONLARI ---
   const fetchProjects = async () => {
     try {
@@ -36,10 +39,23 @@ const AdminDashboard = () => {
     }
   };
 
-  // Sayfa yüklendiğinde hem projeleri hem blogları getir
+  // Mesajlar korumalı bir endpoint olduğu için JWT token'ı ile çekilir
+  const fetchMessages = async () => {
+    try {
+      const res = await axios.get('/api/contact', {
+        headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` }
+      });
+      setMessages(res.data);
+    } catch (err) {
+      console.error("Failed to fetch messages", err);
+    }
+  };
+
+  // Sayfa yüklendiğinde projeleri, blogları ve mesajları getir
   useEffect(() => {
     fetchProjects();
     fetchBlogs();
+    fetchMessages();
   }, []);
 
   // --- ÇIKIŞ YAP ---
@@ -70,6 +86,17 @@ const AdminDashboard = () => {
           className={`px-6 py-2 rounded-lg font-medium transition-colors ${activeTab === 'blogs' ? 'bg-gray-900 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
         >
           Blogs
+        </button>
+        <button
+          onClick={() => setActiveTab('messages')}
+          className={`px-6 py-2 rounded-lg font-medium transition-colors ${activeTab === 'messages' ? 'bg-gray-900 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+        >
+          Messages
+          {messages.length > 0 && (
+            <span className="ml-2 inline-flex items-center justify-center text-xs font-bold bg-emerald-600 text-white rounded-full px-2 py-0.5">
+              {messages.length}
+            </span>
+          )}
         </button>
       </div>
 
@@ -152,6 +179,40 @@ const AdminDashboard = () => {
               </tbody>
             </table>
           </div>
+        </section>
+      )}
+
+      {/* --- MESAJLAR SEKMESİ --- */}
+      {activeTab === 'messages' && (
+        <section className="space-y-4">
+          {messages.map(m => (
+            <div key={m._id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+              <div className="flex justify-between items-start gap-4">
+                <div>
+                  <p className="font-semibold text-gray-900">{m.name}</p>
+                  <a href={`mailto:${m.email}`} className="text-sm text-blue-600 hover:underline">{m.email}</a>
+                </div>
+                <div className="flex items-center gap-4 shrink-0">
+                  <span className="text-xs text-gray-500">{new Date(m.createdAt).toLocaleString()}</span>
+                  <button
+                    onClick={async () => {
+                      if (window.confirm('Delete this message?')) {
+                        await axios.delete(`/api/contact/${m._id}`, { headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` } });
+                        fetchMessages();
+                      }
+                    }}
+                    className="text-red-600 hover:text-red-800 text-sm font-medium"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+              <p className="mt-3 text-gray-700 whitespace-pre-wrap break-words">{m.message}</p>
+            </div>
+          ))}
+          {messages.length === 0 && (
+            <p className="p-4 text-gray-500 italic text-center">No messages yet.</p>
+          )}
         </section>
       )}
     </div>
