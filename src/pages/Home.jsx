@@ -4,6 +4,7 @@ import axios from 'axios';
 import { GitHubCalendar } from 'react-github-calendar';
 import HeroRain from '../components/HeroRain';
 import CodeLoader from '../components/CodeLoader';
+import ContactForm from '../components/ContactForm';
 import { useDocumentMeta } from '../hooks/useDocumentMeta';
 
 const Home = () => {
@@ -252,6 +253,9 @@ const Home = () => {
                     </section>
 
                 </main>
+
+                {/* Contact */}
+                <ContactForm />
             </div>
         </div>
     );
