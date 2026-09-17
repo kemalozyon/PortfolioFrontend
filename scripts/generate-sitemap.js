@@ -1,11 +1,11 @@
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { API_BASE } from './api-config.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const SITE_URL = process.env.SITE_URL || 'https://www.kemalozyon.com';
-const API_BASE = process.env.API_BASE || 'https://portfoliobackend-production-3611.up.railway.app';
 const FETCH_TIMEOUT_MS = 60_000;
 
 const STATIC_ROUTES = [

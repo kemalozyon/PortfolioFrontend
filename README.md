@@ -2,7 +2,7 @@
 
 The frontend for my personal portfolio site. A React 19 single-page app that renders public pages for projects and blog posts and a JWT-protected admin dashboard for managing content.
 
-The companion backend lives in the sibling `backend/` repo and is deployed at `https://portfoliobackend-production-3611.up.railway.app`. The Vite dev server proxies `/api/*` to that URL, so this app talks to real production data in development.
+The companion Express backend lives in the sibling `backend/` repo and is deployed separately on Vercel. Set `VITE_API_URL` to its origin (without `/api`). The browser and the sitemap/prerender build scripts use the same setting.
 
 ## Tech stack
 
@@ -17,6 +17,7 @@ The companion backend lives in the sibling `backend/` repo and is deployed at `h
 
 ```bash
 npm install
+cp .env.example .env
 npm run dev      # start the Vite dev server
 ```
 
@@ -58,11 +59,15 @@ The login page POSTs credentials to the backend and stores the returned JWT in `
 
 ## Backend proxy
 
-`vite.config.js` forwards `/api/*` to the deployed backend so you don't need to run the backend locally. To point at a local backend instead, edit the `proxy.target` in `vite.config.js`.
+In development, `vite.config.js` forwards `/api/*` to `VITE_API_URL`, falling back to `http://localhost:5000`. Run `npm run dev` in the sibling backend for local development. Set the frontend `.env` to the deployed backend origin to use production data instead, then restart Vite.
 
 ## Deployment
 
 Build output lands in `dist/` and is a fully static bundle — deploy it to any static host (Vercel, Netlify, Cloudflare Pages, etc.). Make sure the host rewrites unknown paths to `index.html` so client-side routing works on direct URL hits.
+
+In the frontend Vercel project's Environment Variables, set `VITE_API_URL` to the backend's production origin, for example `https://your-backend.vercel.app`. Enable it for Production and Preview as needed, then redeploy. A missing or invalid origin fails the build. Production Axios calls go directly to that origin; the backend CORS policy must allow the frontend's origin. Preview frontend domains need their own CORS permission.
+
+`VITE_API_URL` is a public URL included in the browser bundle. Keep MongoDB, JWT, Cloudinary, and Resend secrets in the backend project only.
 
 ## Notes on authorship
 

@@ -1,11 +1,11 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { API_BASE } from './api-config.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const SITE_URL  = process.env.SITE_URL  || 'https://www.kemalozyon.com';
-const API_BASE  = process.env.API_BASE  || 'https://portfoliobackend-production-3611.up.railway.app';
 const DIST_DIR  = join(__dirname, '..', 'dist');
 const DEFAULT_IMAGE = `${SITE_URL}/android-chrome-512x512.png`;
 const FETCH_TIMEOUT_MS = 60_000;
