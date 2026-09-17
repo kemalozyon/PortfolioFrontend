@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeSlug from 'rehype-slug';
 import TableOfContents from '../components/TableOfContents';
 import CodeBlock from '../components/CodeBlock';
-import CodeLoader from '../components/CodeLoader';
+import LoadingSkeleton from '../components/LoadingSkeleton';
+import FetchError from '../components/FetchError';
+import { useRemoteData } from '../hooks/useRemoteData';
 import { useDocumentMeta } from '../hooks/useDocumentMeta';
 
 const stripMarkdown = (md = '') =>
@@ -15,21 +15,14 @@ const stripMarkdown = (md = '') =>
     .replace(/`[^`]*`/g, ' ')
     .replace(/!\[[^\]]*]\([^)]*\)/g, ' ')
     .replace(/\[([^\]]*)]\([^)]*\)/g, '$1')
-    .replace(/[#>*_~\-]+/g, ' ')
+    .replace(/[#>*_~-]+/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 
 const BlogDetail = () => {
   const { id } = useParams();
-  const [blog, setBlog] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    axios.get(`/api/blogs/${id}`)
-      .then(res => setBlog(res.data))
-      .catch(err => console.error(err))
-      .finally(() => setLoading(false));
-  }, [id]);
+  const { data, loading, error, retry } = useRemoteData(`/api/blogs/${id}`, false);
+  const blog = data;
 
   useDocumentMeta({
     title: blog?.title,
@@ -39,11 +32,8 @@ const BlogDetail = () => {
     type: 'article',
   });
 
-  if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-950 px-6">
-      <CodeLoader label="blog-post" />
-    </div>
-  );
+  if (loading) return <div className="min-h-screen bg-slate-950 max-w-6xl mx-auto px-6 py-12"><LoadingSkeleton variant="blog" /></div>;
+  if (error) return <div className="min-h-screen bg-slate-950 max-w-6xl mx-auto px-6 py-12"><FetchError label="Blog post" error={error} onRetry={retry} /></div>;
   if (!blog)    return <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-950 dark:text-slate-300">Blog post not found.</div>;
 
   return (

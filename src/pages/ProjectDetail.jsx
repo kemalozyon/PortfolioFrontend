@@ -1,25 +1,18 @@
-import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeSlug from 'rehype-slug';
-import axios from 'axios';
 import TableOfContents from '../components/TableOfContents';
 import CodeBlock from '../components/CodeBlock';
-import CodeLoader from '../components/CodeLoader';
+import LoadingSkeleton from '../components/LoadingSkeleton';
+import FetchError from '../components/FetchError';
+import { useRemoteData } from '../hooks/useRemoteData';
 import { useDocumentMeta } from '../hooks/useDocumentMeta';
 
 const ProjectDetail = () => {
   const { id } = useParams();
-  const [project, setProject] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    axios.get(`/api/projects/${id}`)
-      .then(res => setProject(res.data))
-      .catch(err => console.error(err))
-      .finally(() => setLoading(false));
-  }, [id]);
+  const { data, loading, error, retry } = useRemoteData(`/api/projects/${id}`, false);
+  const project = data;
 
   useDocumentMeta({
     title: project?.title,
@@ -29,11 +22,8 @@ const ProjectDetail = () => {
     type: 'article',
   });
 
-  if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-950 px-6">
-      <CodeLoader label="project" />
-    </div>
-  );
+  if (loading) return <div className="min-h-screen bg-slate-950 max-w-6xl mx-auto px-6 py-12"><LoadingSkeleton variant="project" /></div>;
+  if (error) return <div className="min-h-screen bg-slate-950 max-w-6xl mx-auto px-6 py-12"><FetchError label="Project" error={error} onRetry={retry} /></div>;
   if (!project) return <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-950 dark:text-slate-300">Project not found.</div>;
 
   return (

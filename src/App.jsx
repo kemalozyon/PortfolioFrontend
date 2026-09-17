@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Analytics } from '@vercel/analytics/react';
-import { ThemeProvider } from './context/ThemeContext';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Projects from './pages/Projects';
@@ -14,7 +13,6 @@ import NotFound from './pages/NotFound';
 
 function App() {
   return (
-    <ThemeProvider>
     <BrowserRouter>
       {/* Navbar her sayfanın tepesinde kalacak */}
       <Navbar /> 
@@ -44,7 +42,6 @@ function App() {
       </Routes>
       <Analytics />
     </BrowserRouter>
-    </ThemeProvider>
   );
 }
 

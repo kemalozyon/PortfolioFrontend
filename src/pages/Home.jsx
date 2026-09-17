@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
 import { GitHubCalendar } from 'react-github-calendar';
-import HeroRain from '../components/HeroRain';
-import CodeLoader from '../components/CodeLoader';
+import HeroNetwork from '../components/HeroNetwork';
+import LoadingSkeleton from '../components/LoadingSkeleton';
+import FetchError from '../components/FetchError';
+import { useRemoteData } from '../hooks/useRemoteData';
 import ContactForm from '../components/ContactForm';
 import { useDocumentMeta } from '../hooks/useDocumentMeta';
 
@@ -13,52 +13,23 @@ const Home = () => {
         description: 'Personal portfolio of Kemal Özyön — backend-focused software developer building scalable APIs, data-driven applications, and AI-powered agentic systems. Browse projects and blog posts.',
         path: '/',
     });
-    const [featuredProjects, setFeaturedProjects] = useState([]);
-    const [latestBlogs, setLatestBlogs] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [showScroll, setShowScroll] = useState(true);
-
-    useEffect(() => {
-        const onScroll = () => setShowScroll(window.scrollY < 60);
-        window.addEventListener('scroll', onScroll, { passive: true });
-        return () => window.removeEventListener('scroll', onScroll);
-    }, []);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [projectsRes, blogsRes] = await Promise.all([
-                    axios.get('/api/projects'),
-                    axios.get('/api/blogs')
-                ]);
-                setFeaturedProjects(projectsRes.data.filter(p => p.isFeatured === true));
-                setLatestBlogs(blogsRes.data.slice(0, 3));
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
-    }, []);
+    const projectsRequest = useRemoteData('/api/projects', true);
+    const blogsRequest = useRemoteData('/api/blogs', true);
+    const featuredProjects = (projectsRequest.data || []).filter(p => p.isFeatured === true);
+    const latestBlogs = (blogsRequest.data || []).slice(0, 3);
 
     return (
         <div className="bg-gray-50 dark:bg-slate-950 font-sans text-gray-800 dark:text-slate-200 transition-colors duration-300">
 
             {/* ── HERO ─────────────────────────────────────────────────── */}
-            <section className="relative h-screen flex flex-col items-center justify-center overflow-hidden px-6 dark:bg-slate-950">
+            <section className="relative flex flex-col items-center justify-center overflow-hidden px-6 py-12 md:py-16 dark:bg-slate-950">
 
-                <HeroRain />
-
-                {/* Animated background blobs */}
-                <div className="absolute top-1/4 -left-40 w-[500px] h-[500px] rounded-full bg-emerald-300 opacity-25 blur-3xl animate-blob" />
-                <div className="absolute top-1/3 -right-40 w-[450px] h-[450px] rounded-full bg-teal-300 opacity-20 blur-3xl animate-blob [animation-delay:3s]" />
-                <div className="absolute bottom-1/4 left-1/3 w-[400px] h-[400px] rounded-full bg-emerald-200 opacity-15 blur-3xl animate-blob [animation-delay:5.5s]" />
+                <HeroNetwork />
 
                 {/* Hero content */}
                 <div className="relative z-10 text-center max-w-3xl mx-auto">
                     <p
-                        className="text-sm font-bold uppercase tracking-[0.3em] text-emerald-600 dark:text-emerald-400 mb-5 animate-fade-in-up"
+                        className="font-mono text-xs sm:text-sm uppercase tracking-[0.15em] text-emerald-600 dark:text-emerald-400 mb-5 animate-fade-in-up"
                         style={{ animationDelay: '0ms' }}
                     >
                         Backend-Focused Software Developer + AI Enthusiast
@@ -79,13 +50,16 @@ const Home = () => {
                         I design and develop scalable backend systems, APIs, and data-driven applications. Currently focused on backend engineering, and AI-powered agentic systems.
                     </p>
                     <div
-                        className="flex justify-center mb-6 animate-fade-in-up"
+                        className="flex flex-wrap gap-3 justify-center mb-6 animate-fade-in-up"
                         style={{ animationDelay: '360ms' }}
                     >
+                        <Link to="/projects" className="inline-flex items-center gap-2 rounded-lg bg-emerald-400 px-6 py-3 font-semibold text-slate-950 hover:bg-emerald-300 transition-colors">
+                            View Projects <span aria-hidden="true">↗</span>
+                        </Link>
                         <a
                             href="/Kemal-Ozyon-CV.pdf"
                             download="Kemal-Ozyon-CV.pdf"
-                            className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-7 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition-all"
+                            className="inline-flex items-center gap-2 border border-slate-800 hover:border-emerald-400 text-slate-200 px-6 py-3 rounded-lg font-semibold transition-colors"
                         >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" />
@@ -138,15 +112,6 @@ const Home = () => {
                     </div>
                 </div>
 
-                {/* Scroll indicator */}
-                {showScroll && (
-                    <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-1 animate-scroll-bounce pointer-events-none">
-                        <span className="text-xs text-gray-400 font-medium tracking-widest uppercase">Scroll</span>
-                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </div>
-                )}
             </section>
 
             {/* ── BELOW THE FOLD ───────────────────────────────────────── */}
@@ -175,7 +140,7 @@ const Home = () => {
                                 blockSize={12}
                                 blockMargin={4}
                                 fontSize={14}
-                                colorScheme="light"
+                                colorScheme="dark"
                                 labels={{ totalCount: '{{count}} contributions in the last year' }}
                             />
                         </div>
@@ -190,10 +155,10 @@ const Home = () => {
                             <h2 className="text-3xl font-bold text-gray-900 dark:text-slate-100">Featured Projects</h2>
                             <Link to="/projects" className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 font-medium">See All →</Link>
                         </div>
-                        {loading ? (
-                            <div className="flex justify-center py-12">
-                                <CodeLoader label="projects" compact />
-                            </div>
+                        {projectsRequest.loading ? (
+                            <LoadingSkeleton variant="projects" compact />
+                        ) : projectsRequest.error ? (
+                            <FetchError label="Projects" error={projectsRequest.error} onRetry={projectsRequest.retry} />
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 {featuredProjects.map((project) => (
@@ -224,10 +189,10 @@ const Home = () => {
                             <h2 className="text-3xl font-bold text-gray-900 dark:text-slate-100">Blogs</h2>
                             <Link to="/blogs" className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 font-medium">All Posts →</Link>
                         </div>
-                        {loading ? (
-                            <div className="flex justify-center py-12">
-                                <CodeLoader label="blogs" compact />
-                            </div>
+                        {blogsRequest.loading ? (
+                            <LoadingSkeleton variant="blogs" compact />
+                        ) : blogsRequest.error ? (
+                            <FetchError label="Blog posts" error={blogsRequest.error} onRetry={blogsRequest.retry} />
                         ) : (
                             <div className="space-y-4">
                                 {latestBlogs.length === 0 ? (

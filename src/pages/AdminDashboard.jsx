@@ -1,5 +1,5 @@
 // frontend/src/pages/AdminDashboard.jsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ProjectForm from '../components/ProjectForm';
@@ -8,6 +8,10 @@ import BlogForm from '../components/BlogForm'; // BlogForm'u import ettik
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('projects');
+  const [formOpen, setFormOpen] = useState(false);
+  const [notice, setNotice] = useState('');
+  const [errors, setErrors] = useState({});
+  const [pending, setPending] = useState({ projects: true, blogs: true, messages: true });
 
   // --- PROJE STATE'LERİ ---
   const [projects, setProjects] = useState([]);
@@ -20,43 +24,36 @@ const AdminDashboard = () => {
   // --- MESAJ STATE'LERİ ---
   const [messages, setMessages] = useState([]);
 
-  // --- VERİ ÇEKME FONKSİYONLARI ---
-  const fetchProjects = async () => {
-    try {
-      const res = await axios.get('/api/projects');
-      setProjects(res.data);
-    } catch (err) {
-      console.error("Failed to fetch projects", err);
-    }
-  };
-
-  const fetchBlogs = async () => {
-    try {
-      const res = await axios.get('/api/blogs');
-      setBlogs(res.data);
-    } catch (err) {
-      console.error("Failed to fetch blogs", err);
-    }
-  };
-
-  // Mesajlar korumalı bir endpoint olduğu için JWT token'ı ile çekilir
-  const fetchMessages = async () => {
-    try {
-      const res = await axios.get('/api/contact', {
-        headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` }
-      });
-      setMessages(res.data);
-    } catch (err) {
-      console.error("Failed to fetch messages", err);
-    }
-  };
-
-  // Sayfa yüklendiğinde projeleri, blogları ve mesajları getir
-  useEffect(() => {
-    fetchProjects();
-    fetchBlogs();
-    fetchMessages();
+  const loadContent = useCallback((type, url, protectedRequest = false) => {
+    const headers = protectedRequest
+      ? { Authorization: `Bearer ${localStorage.getItem('adminToken')}` }
+      : {};
+    return axios.get(url, { headers, timeout: 15000 })
+      .then(({ data }) => {
+        if (!Array.isArray(data)) throw new Error('Unexpected API response');
+        ({ projects: setProjects, blogs: setBlogs, messages: setMessages })[type](data);
+        setErrors(previous => ({ ...previous, [type]: '' }));
+      })
+      .catch(() => {
+        setErrors(previous => ({ ...previous, [type]: `Unable to load ${type}. Please try again.` }));
+      })
+      .finally(() => setPending(previous => ({ ...previous, [type]: false })));
   }, []);
+
+  const reloadContent = (type, url, protectedRequest = false) => {
+    setPending(previous => ({ ...previous, [type]: true }));
+    setErrors(previous => ({ ...previous, [type]: '' }));
+    return loadContent(type, url, protectedRequest);
+  };
+  const fetchProjects = () => reloadContent('projects', '/api/projects');
+  const fetchBlogs = () => reloadContent('blogs', '/api/blogs');
+  const fetchMessages = () => reloadContent('messages', '/api/contact', true);
+
+  useEffect(() => {
+    loadContent('projects', '/api/projects');
+    loadContent('blogs', '/api/blogs');
+    loadContent('messages', '/api/contact', true);
+  }, [loadContent]);
 
   // --- ÇIKIŞ YAP ---
   const handleLogout = () => {
@@ -66,31 +63,31 @@ const AdminDashboard = () => {
 
   // Sekme butonları için ortak stil (aktif / pasif, açık / koyu tema)
   const tabClass = (tab) =>
-    `px-6 py-2 rounded-lg font-medium transition-colors ${
+    `px-4 py-2 rounded-lg font-mono text-sm transition-colors ${
       activeTab === tab
-        ? 'bg-gray-900 dark:bg-emerald-600 text-white'
-        : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
+        ? 'bg-emerald-400/10 text-emerald-400 border border-emerald-400/20'
+        : 'border border-transparent text-slate-400 hover:bg-slate-900 hover:text-slate-200'
     }`;
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors duration-300">
-      <div className="max-w-5xl mx-auto p-6 font-sans text-gray-800 dark:text-slate-200">
-        <header className="flex justify-between items-center mb-8 border-b border-gray-200 dark:border-slate-800 pb-4">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-100">Admin Panel</h1>
-          <button onClick={handleLogout} className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition-colors">
+      <div className="admin-content max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12 font-sans text-gray-800 dark:text-slate-200">
+        <header className="flex flex-wrap gap-4 justify-between items-center mb-8 border-b border-gray-200 dark:border-slate-800 pb-4">
+          <div><p className="font-mono text-xs tracking-widest text-emerald-400 mb-2">PORTFOLIO / WORKSPACE</p><h1 className="text-3xl font-semibold text-slate-100">Content manager</h1><p className="text-sm text-slate-400 mt-2">Manage projects, writing, and your inbox.</p></div>
+          <button onClick={handleLogout} className="border border-slate-700 hover:border-slate-500 text-slate-300 font-medium py-2 px-4 rounded-lg transition-colors">
             Log Out
           </button>
         </header>
 
         {/* SEKMELER */}
-        <div className="flex gap-4 mb-8">
-          <button onClick={() => setActiveTab('projects')} className={tabClass('projects')}>
+        <div className="flex flex-wrap gap-2 mb-8 border-b border-slate-800 pb-4">
+          <button onClick={() => { setActiveTab('projects'); setFormOpen(false); setEditingProject(null); setEditingBlog(null); }} className={tabClass('projects')}>
             Projects
           </button>
-          <button onClick={() => setActiveTab('blogs')} className={tabClass('blogs')}>
+          <button onClick={() => { setActiveTab('blogs'); setFormOpen(false); setEditingProject(null); setEditingBlog(null); }} className={tabClass('blogs')}>
             Blogs
           </button>
-          <button onClick={() => setActiveTab('messages')} className={tabClass('messages')}>
+          <button onClick={() => { setActiveTab('messages'); setFormOpen(false); setEditingProject(null); setEditingBlog(null); }} className={tabClass('messages')}>
             Messages
             {messages.length > 0 && (
               <span className="ml-2 inline-flex items-center justify-center text-xs font-bold bg-emerald-600 text-white rounded-full px-2 py-0.5">
@@ -100,16 +97,26 @@ const AdminDashboard = () => {
           </button>
         </div>
 
+        {notice && <div role="status" className="mb-6 flex items-center justify-between gap-4 rounded-lg border border-emerald-400/20 bg-emerald-400/5 p-4 text-sm text-emerald-300">{notice}<button onClick={() => setNotice('')} aria-label="Dismiss notification">×</button></div>}
+        {errors[activeTab] && <div role="alert" className="mb-6 rounded-lg border border-red-400/20 bg-red-400/5 p-4 text-red-300">{errors[activeTab]} <button className="ml-3 underline" onClick={() => ({ projects: fetchProjects, blogs: fetchBlogs, messages: fetchMessages })[activeTab]()}>Try again</button></div>}
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+          <div><h2 className="text-xl font-semibold capitalize">{activeTab}</h2><p className="text-sm text-slate-400 mt-1">{pending[activeTab] ? 'Loading content…' : `${({projects, blogs, messages})[activeTab].length} items`}</p></div>
+          {activeTab !== 'messages' && !formOpen && <button className="rounded-lg bg-emerald-400 px-4 py-2.5 text-sm font-semibold text-slate-950 hover:bg-emerald-300" onClick={() => { setFormOpen(true); setNotice(''); }}>+ New {activeTab === 'projects' ? 'project' : 'post'}</button>}
+        </div>
         {/* --- PROJELER SEKMESİ --- */}
         {activeTab === 'projects' && (
           <section>
-            <ProjectForm
+            {formOpen && <ProjectForm
+              key={editingProject?._id || "new"}
+              onCancel={() => { setFormOpen(false); setEditingProject(null); }}
               editProject={editingProject}
               onComplete={() => {
                 setEditingProject(null);
+                setFormOpen(false);
+                setNotice("Project saved successfully.");
                 fetchProjects();
               }}
-            />
+            />}
 
             <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden">
               <table className="w-full text-left">
@@ -124,7 +131,7 @@ const AdminDashboard = () => {
                     <tr key={p._id} className="border-b border-gray-100 dark:border-slate-800 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors">
                       <td className="p-4 text-gray-800 dark:text-slate-200 font-medium">{p.title}</td>
                       <td className="p-4 space-x-4">
-                        <button onClick={() => { setEditingProject(p); window.scrollTo(0, 0); }} className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium">Edit</button>
+                        <button onClick={() => { setFormOpen(true); setEditingProject(p); window.scrollTo(0, 0); }} className="text-emerald-400 hover:text-emerald-300 font-medium">Edit</button>
                         <button onClick={async () => {
                           if (window.confirm('Are you sure you want to delete this project?')) {
                             await axios.delete(`/api/projects/${p._id}`, { headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` } });
@@ -134,7 +141,7 @@ const AdminDashboard = () => {
                       </td>
                     </tr>
                   ))}
-                  {projects.length === 0 && <tr><td colSpan="2" className="p-4 text-gray-500 dark:text-slate-500 italic text-center">No projects added yet.</td></tr>}
+                  {!pending.projects && !errors.projects && projects.length === 0 && <tr><td colSpan="2" className="p-4 text-gray-500 dark:text-slate-500 italic text-center">No projects added yet.</td></tr>}
                 </tbody>
               </table>
             </div>
@@ -144,13 +151,17 @@ const AdminDashboard = () => {
         {/* --- BLOGLAR SEKMESİ --- */}
         {activeTab === 'blogs' && (
           <section>
-            <BlogForm
+            {formOpen && <BlogForm
+              key={editingBlog?._id || "new"}
+              onCancel={() => { setFormOpen(false); setEditingBlog(null); }}
               editBlog={editingBlog}
               onComplete={() => {
                 setEditingBlog(null);
+                setFormOpen(false);
+                setNotice("Blog saved successfully.");
                 fetchBlogs();
               }}
-            />
+            />}
 
             <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden">
               <table className="w-full text-left">
@@ -165,7 +176,7 @@ const AdminDashboard = () => {
                     <tr key={b._id} className="border-b border-gray-100 dark:border-slate-800 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors">
                       <td className="p-4 text-gray-800 dark:text-slate-200 font-medium">{b.title}</td>
                       <td className="p-4 space-x-4">
-                        <button onClick={() => { setEditingBlog(b); window.scrollTo(0, 0); }} className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium">Edit</button>
+                        <button onClick={() => { setFormOpen(true); setEditingBlog(b); window.scrollTo(0, 0); }} className="text-emerald-400 hover:text-emerald-300 font-medium">Edit</button>
                         <button onClick={async () => {
                           if (window.confirm('Are you sure you want to delete this blog post?')) {
                             await axios.delete(`/api/blogs/${b._id}`, { headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` } });
@@ -175,7 +186,7 @@ const AdminDashboard = () => {
                       </td>
                     </tr>
                   ))}
-                  {blogs.length === 0 && <tr><td colSpan="2" className="p-4 text-gray-500 dark:text-slate-500 italic text-center">No blog posts added yet.</td></tr>}
+                  {!pending.blogs && !errors.blogs && blogs.length === 0 && <tr><td colSpan="2" className="p-4 text-gray-500 dark:text-slate-500 italic text-center">No blog posts added yet.</td></tr>}
                 </tbody>
               </table>
             </div>
@@ -187,12 +198,12 @@ const AdminDashboard = () => {
           <section className="space-y-4">
             {messages.map(m => (
               <div key={m._id} className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 p-5">
-                <div className="flex justify-between items-start gap-4">
+                <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
                   <div>
                     <p className="font-semibold text-gray-900 dark:text-slate-100">{m.name}</p>
                     <a href={`mailto:${m.email}`} className="text-sm text-blue-600 dark:text-blue-400 hover:underline">{m.email}</a>
                   </div>
-                  <div className="flex items-center gap-4 shrink-0">
+                  <div className="flex flex-wrap items-center gap-4">
                     <span className="text-xs text-gray-500 dark:text-slate-400">{new Date(m.createdAt).toLocaleString()}</span>
                     <button
                       onClick={async () => {
@@ -210,7 +221,7 @@ const AdminDashboard = () => {
                 <p className="mt-3 text-gray-700 dark:text-slate-300 whitespace-pre-wrap break-words">{m.message}</p>
               </div>
             ))}
-            {messages.length === 0 && (
+            {!pending.messages && !errors.messages && messages.length === 0 && (
               <p className="p-4 text-gray-500 dark:text-slate-500 italic text-center">No messages yet.</p>
             )}
           </section>

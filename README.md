@@ -57,6 +57,10 @@ vite.config.js   # dev proxy to the backend
 
 The login page POSTs credentials to the backend and stores the returned JWT in `localStorage`. The `ProtectedRoute` component reads that token and redirects to `/login` if it's missing. Authenticated requests attach the token as a `Bearer` header.
 
+## Appearance
+
+The site uses a permanent dark theme applied in `index.html` before first paint. The hero contains a lightweight SVG packet-routing animation; users who prefer reduced motion see the static network. Navigation details use monospace type while body text stays sans-serif.
+
 ## Backend proxy
 
 In development, `vite.config.js` forwards `/api/*` to `VITE_API_URL`, falling back to `http://localhost:5000`. Run `npm run dev` in the sibling backend for local development. Set the frontend `.env` to the deployed backend origin to use production data instead, then restart Vite.

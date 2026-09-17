@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Link } from 'react-router-dom';
-import CodeLoader from '../components/CodeLoader';
+import LoadingSkeleton from '../components/LoadingSkeleton';
+import FetchError from '../components/FetchError';
+import { useRemoteData } from '../hooks/useRemoteData';
 import { useDocumentMeta } from '../hooks/useDocumentMeta';
 
 const Projects = () => {
-  const [projects, setProjects] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { data, loading, error, retry } = useRemoteData('/api/projects', true);
+  const projects = data || [];
 
   useDocumentMeta({
     title: 'Projects',
@@ -14,23 +14,11 @@ const Projects = () => {
     path: '/projects',
   });
 
-  useEffect(() => {
-    axios.get('/api/projects')
-      .then(res => setProjects(res.data))
-      .catch(err => console.error(err))
-      .finally(() => setLoading(false));
-  }, []);
-
-  if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-950 px-6">
-      <CodeLoader label="projects" />
-    </div>
-  );
-
   return (
     <div className="bg-gray-50 dark:bg-slate-950 min-h-screen transition-colors duration-300">
       <div className="max-w-5xl mx-auto px-6 py-12">
         <h1 className="text-4xl font-extrabold text-gray-900 dark:text-slate-100 mb-8">All My Projects</h1>
+        {loading ? <LoadingSkeleton variant="projects" /> : error ? <FetchError label="Projects" error={error} onRetry={retry} /> : projects.length === 0 ? <p className="text-slate-400">No projects published yet.</p> : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {projects.map((project) => (
             <Link
@@ -57,6 +45,7 @@ const Projects = () => {
             </Link>
           ))}
         </div>
+        )}
       </div>
     </div>
   );

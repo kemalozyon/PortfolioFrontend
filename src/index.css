@@ -2,23 +2,24 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
-/* Enable class-based dark mode — toggled by .dark on <html> */
+/* The site uses a permanent dark theme, set in index.html before first paint. */
 @variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-slate-950: #090c0c;
+  --color-slate-900: #101616;
+  --color-slate-800: #22302d;
+}
 
 html,
 body {
-  background-color: #f9fafb; /* gray-50 */
+  background-color: #090c0c;
+  color-scheme: dark;
 }
 
 html.dark,
 html.dark body {
-  background-color: #020617; /* slate-950 */
-}
-
-@keyframes blob {
-  0%, 100% { transform: translate(0px, 0px) scale(1); }
-  33%       { transform: translate(40px, -60px) scale(1.15); }
-  66%       { transform: translate(-30px, 30px) scale(0.9); }
+  background-color: #090c0c;
 }
 
 @keyframes fadeInUp {
@@ -26,19 +27,62 @@ html.dark body {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes scrollBounce {
-  0%, 100% { transform: translateY(0); opacity: 0.6; }
-  50%       { transform: translateY(8px); opacity: 1; }
-}
-
-@utility animate-blob {
-  animation: blob 8s ease-in-out infinite;
-}
-
 @utility animate-fade-in-up {
   animation: fadeInUp 0.7s ease both;
 }
 
-@utility animate-scroll-bounce {
-  animation: scrollBounce 1.6s ease-in-out infinite;
+:focus-visible {
+  outline: 2px solid #6ee7b7;
+  outline-offset: 4px;
+}
+
+@keyframes skeletonPulse {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 0.85; }
+}
+
+.skeleton {
+  animation: skeletonPulse 2s ease-in-out infinite;
+}
+
+/* Content lists become individual rows with full-width actions on small screens. */
+@media (max-width: 639px) {
+  .admin-content table,
+  .admin-content tbody {
+    display: block;
+    width: 100%;
+  }
+
+  .admin-content thead {
+    display: none;
+  }
+
+  .admin-content tr {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .admin-content td {
+    width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  .admin-content td + td {
+    padding-top: 0;
+    padding-bottom: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .network-packet {
+    display: none;
+  }
+
+  .animate-fade-in-up {
+    animation: none;
+  }
+
+  .skeleton {
+    animation: none;
+  }
 }

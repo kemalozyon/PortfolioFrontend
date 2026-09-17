@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Link } from 'react-router-dom';
-import CodeLoader from '../components/CodeLoader';
+import LoadingSkeleton from '../components/LoadingSkeleton';
+import FetchError from '../components/FetchError';
+import { useRemoteData } from '../hooks/useRemoteData';
 import { useDocumentMeta } from '../hooks/useDocumentMeta';
 
 const Blogs = () => {
-  const [blogs, setBlogs] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { data, loading, error, retry } = useRemoteData('/api/blogs', true);
+  const blogs = data || [];
 
   useDocumentMeta({
     title: 'Blog',
@@ -14,23 +14,11 @@ const Blogs = () => {
     path: '/blogs',
   });
 
-  useEffect(() => {
-    axios.get('/api/blogs')
-      .then(res => setBlogs(res.data))
-      .catch(err => console.error(err))
-      .finally(() => setLoading(false));
-  }, []);
-
-  if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-950 px-6">
-      <CodeLoader label="blogs" />
-    </div>
-  );
-
   return (
     <div className="bg-gray-50 dark:bg-slate-950 min-h-screen transition-colors duration-300">
       <div className="max-w-5xl mx-auto px-6 py-12">
         <h1 className="text-4xl font-extrabold text-gray-900 dark:text-slate-100 mb-8">My Blog Posts</h1>
+        {loading ? <LoadingSkeleton variant="blogs" /> : error ? <FetchError label="Blog posts" error={error} onRetry={retry} /> : blogs.length === 0 ? <p className="text-slate-400">No blog posts published yet.</p> : (
         <div className="space-y-6">
           {blogs.map((blog) => (
             <Link
@@ -54,6 +42,7 @@ const Blogs = () => {
             </Link>
           ))}
         </div>
+        )}
       </div>
     </div>
   );
