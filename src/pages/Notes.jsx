@@ -169,7 +169,7 @@ const Notes = () => {
     </div>
   );
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200">
+    <div className="min-h-screen bg-slate-950 pb-24 text-slate-200 lg:pb-0">
       <div className="mx-auto max-w-[1440px] px-4 sm:px-6">
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
@@ -322,7 +322,7 @@ const Notes = () => {
                         </p>
                       )}
                   </div>
-                  {content && <TableOfContents content={content} />}
+                  {content && <TableOfContents key={noteId || folderId} content={content} mobile />}
                 </div>
               </>
             )}

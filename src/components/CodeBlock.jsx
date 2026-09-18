@@ -2,7 +2,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 const CodeBlock = ({ className, children }) => {
-  const match = /language-(\w+)/.exec(className || '');
+  const match = /language-([\w+-]+)/.exec(className || '');
 
   if (match) {
     return (
@@ -10,7 +10,7 @@ const CodeBlock = ({ className, children }) => {
         language={match[1]}
         style={oneDark}
         PreTag="div"
-        customStyle={{ borderRadius: '0.75rem', fontSize: '0.875rem', margin: 0 }}
+        customStyle={{ borderRadius: '0.75rem', fontSize: '0.8125rem', lineHeight: 1.65, margin: 0, padding: '0.875rem', overflowX: 'auto' }}
       >
         {String(children).replace(/\n$/, '')}
       </SyntaxHighlighter>

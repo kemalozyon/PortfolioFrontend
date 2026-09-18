@@ -65,12 +65,13 @@ const NoteImage = ({ src, alt, admin }) => {
   return <img src={result.url} alt={alt || ""} />;
 };
 const NoteMarkdown = ({ content = "", admin = false }) => (
-  <div className="prose prose-invert prose-emerald max-w-none prose-headings:scroll-mt-24 prose-pre:bg-slate-900 prose-img:rounded-lg break-words [&_.katex-display]:overflow-x-auto [&_table]:block [&_table]:overflow-x-auto">
+  <div data-note-content className="prose prose-invert prose-emerald max-w-none prose-headings:scroll-mt-28 prose-img:rounded-lg break-words [&_.katex-display]:overflow-x-auto [&_table]:block [&_table]:overflow-x-auto">
     <ReactMarkdown
       remarkPlugins={[remarkGfm, remarkMath]}
       rehypePlugins={[rehypeKatex, rehypeSlug]}
       components={{
         code: CodeBlock,
+        pre: ({ children }) => <div className="not-prose my-5 min-w-0 overflow-x-auto rounded-xl bg-slate-900 [&>code]:block [&>code]:whitespace-pre [&>code]:p-3.5" tabIndex={0} aria-label="Code block">{children}</div>,
         img: ({ src, alt }) => <NoteImage src={src} alt={alt} admin={admin} />,
         a: ({ href, children }) => (
           <a href={href} rel="noopener noreferrer">
