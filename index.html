@@ -9,6 +9,26 @@
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="theme-color" content="#090c0c" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>document.documentElement.setAttribute('data-app-loading', '');</script>
+    <style>
+      html[data-app-loading] { background: #090c0c; color: #cbd5e1; }
+      html[data-app-loading] #root > main {
+        position: absolute; width: 1px; height: 1px; padding: 0;
+        overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+      }
+      html[data-app-loading] body::before {
+        content: ''; position: fixed; inset: 0; z-index: 9998; background: #090c0c;
+      }
+      html[data-app-loading] body::after {
+        content: ''; position: fixed; left: calc(50% - 10px); top: calc(50% - 10px);
+        z-index: 9999; width: 20px; height: 20px; border: 2px solid #1e293b;
+        border-top-color: #34d399; border-radius: 50%; animation: app-boot-spin .8s linear infinite;
+      }
+      @keyframes app-boot-spin { to { transform: rotate(360deg); } }
+      @media (prefers-reduced-motion: reduce) {
+        html[data-app-loading] body::after { animation: none; }
+      }
+    </style>
 
     <title>Kemal Özyön — Backend-Focused Software Developer & AI Enthusiast</title>
     <meta name="description" content="Personal portfolio of Kemal Özyön — backend-focused software developer building scalable APIs, data-driven applications, and AI-powered agentic systems. See my projects and blog." />
