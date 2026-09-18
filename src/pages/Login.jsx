@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { clearNotes } from '../lib/notesApi';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -19,6 +20,7 @@ const Login = () => {
     try {
       const response = await axios.post('/api/auth/login', { email, password });
 
+      clearNotes();
       localStorage.setItem('adminToken', response.data.token);
       navigate('/admin');
     } catch {

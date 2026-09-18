@@ -1,24 +1,28 @@
-const toSlug = (text) =>
-  text
-    .toLowerCase()
-    .replace(/[^\w\s-]/g, '')
-    .trim()
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-');
+import GithubSlugger from 'github-slugger';
 
 const extractHeadings = (markdown) => {
   const headings = [];
+  const slugger = new GithubSlugger();
+  let fence = null;
   for (const line of markdown.split('\n')) {
-    const match = line.match(/^(#{1,3})\s+(.+)$/);
-    if (match) {
-      const rawText = match[2]
-        .replace(/\*\*(.+?)\*\*/g, '$1')
-        .replace(/\*(.+?)\*/g, '$1')
-        .replace(/`(.+?)`/g, '$1')
-        .replace(/\[(.+?)\]\(.+?\)/g, '$1')
-        .trim();
-      headings.push({ level: match[1].length, text: rawText, id: toSlug(rawText) });
+    const marker = line.match(/^\s{0,3}(`{3,}|~{3,})/);
+    if (marker) {
+      if (!fence) fence = marker[1];
+      else if (marker[1][0] === fence[0] && marker[1].length >= fence.length) fence = null;
+      continue;
     }
+    if (fence) continue;
+    const match = line.match(/^\s{0,3}(#{1,6})\s+(.+)$/);
+    if (!match) continue;
+    const rawText = match[2]
+      .replace(/\s+#+\s*$/, '')
+      .replace(/\*\*(.+?)\*\*/g, '$1')
+      .replace(/\*(.+?)\*/g, '$1')
+      .replace(/`(.+?)`/g, '$1')
+      .replace(/\[(.+?)\]\(.+?\)/g, '$1')
+      .trim();
+    const id = slugger.slug(rawText);
+    if (match[1].length <= 3) headings.push({ level: match[1].length, text: rawText, id });
   }
   return headings;
 };

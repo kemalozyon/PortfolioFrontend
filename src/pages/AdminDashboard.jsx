@@ -1,8 +1,9 @@
 // frontend/src/pages/AdminDashboard.jsx
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { invalidateContent } from '../lib/queryClient';
+import { clearNotes } from '../lib/notesApi';
 import ProjectForm from '../components/ProjectForm';
 import BlogForm from '../components/BlogForm'; // BlogForm'u import ettik
 
@@ -59,6 +60,7 @@ const AdminDashboard = () => {
   // --- ÇIKIŞ YAP ---
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
+    clearNotes();
     navigate('/login');
   };
 
@@ -96,6 +98,7 @@ const AdminDashboard = () => {
               </span>
             )}
           </button>
+          <Link to="/admin/notes" className={tabClass('notes')}>Notes ↗</Link>
         </div>
 
         {notice && <div role="status" className="mb-6 flex items-center justify-between gap-4 rounded-lg border border-emerald-400/20 bg-emerald-400/5 p-4 text-sm text-emerald-300">{notice}<button onClick={() => setNotice('')} aria-label="Dismiss notification">×</button></div>}

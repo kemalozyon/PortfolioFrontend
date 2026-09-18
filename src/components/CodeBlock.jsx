@@ -1,7 +1,7 @@
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
-const CodeBlock = ({ className, children, node, ...props }) => {
+const CodeBlock = ({ className, children }) => {
   const match = /language-(\w+)/.exec(className || '');
 
   if (match) {
@@ -18,7 +18,7 @@ const CodeBlock = ({ className, children, node, ...props }) => {
   }
 
   return (
-    <code className="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-sm font-mono">
+    <code className="bg-slate-800 text-slate-200 px-1.5 py-0.5 rounded text-sm font-mono">
       {children}
     </code>
   );

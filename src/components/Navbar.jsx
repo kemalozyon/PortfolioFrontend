@@ -24,7 +24,7 @@ const Navbar = () => {
   }, []);
 
   const isActive = (path) =>
-    location.pathname === path
+    location.pathname === path || (path !== '/' && location.pathname.startsWith(`${path}/`))
       ? 'text-emerald-600 dark:text-emerald-400 font-bold'
       : 'text-gray-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 font-medium';
 
@@ -43,10 +43,11 @@ const Navbar = () => {
           </Link>
         </div>
 
-        <div className="flex justify-center md:justify-end items-center gap-6 mt-2 md:mt-0 font-mono text-sm">
+        <div className="flex justify-center md:justify-end items-center gap-4 sm:gap-6 mt-2 md:mt-0 font-mono text-sm">
           <Link to="/"        className={isActive('/')}>Home</Link>
           <Link to="/projects" className={isActive('/projects')}>Projects</Link>
           <Link to="/blogs"   className={isActive('/blogs')}>Blogs</Link>
+          <Link to="/notes" className={isActive('/notes')}>Notes</Link>
 
         </div>
       </div>

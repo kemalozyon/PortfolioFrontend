@@ -1,6 +1,7 @@
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import process from 'node:process';
 import { API_BASE } from './api-config.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -12,6 +13,7 @@ const STATIC_ROUTES = [
   { path: '/',         changefreq: 'monthly', priority: 1.0 },
   { path: '/projects', changefreq: 'monthly', priority: 0.7 },
   { path: '/blogs',    changefreq: 'weekly',  priority: 0.7 },
+  { path: '/notes',    changefreq: 'weekly',  priority: 0.7 },
 ];
 
 async function fetchJson(path) {

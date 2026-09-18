@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import process from 'node:process';
 import { API_BASE } from './api-config.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -19,7 +20,7 @@ const stripMarkdown = (md = '') =>
     .replace(/`[^`]*`/g, ' ')
     .replace(/!\[[^\]]*]\([^)]*\)/g, ' ')
     .replace(/\[([^\]]*)]\([^)]*\)/g, '$1')
-    .replace(/[#>*_~\-]+/g, ' ')
+    .replace(/[#>*_~-]+/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 
@@ -87,7 +88,15 @@ async function main() {
 
   const template = readFileSync(join(DIST_DIR, 'index.html'), 'utf8');
 
+  // Individual notes stay dynamic: static note titles would survive privatization.
   const staticPages = [
+    {
+      out: 'notes/index.html',
+      title: 'Learning notes — Kemal Özyön',
+      description: 'Study notes on machine learning, algorithms, and software engineering.',
+      path: '/notes',
+      bodyFallback: '<main><h1>Learning notes</h1><p>Study notes on machine learning, algorithms, and software engineering.</p><a href="/">Home</a></main>',
+    },
     {
       out: 'blogs/index.html',
       title: 'Blog — Kemal Özyön',
