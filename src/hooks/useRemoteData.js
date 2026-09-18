@@ -1,33 +1,26 @@
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
+import { contentQueryKey } from '../lib/queryClient';
 
 export const useRemoteData = (url, expectArray = false) => {
-  const [attempt, setAttempt] = useState(0);
-  const [result, setResult] = useState(null);
-  const key = `${url}:${attempt}`;
+  const query = useQuery({
+    queryKey: contentQueryKey(url),
+    queryFn: async ({ signal }) => {
+      const { data } = await axios.get(url, { signal, timeout: 15000 });
+      if (expectArray ? !Array.isArray(data) : !data || typeof data !== 'object' || Array.isArray(data)) {
+        throw new Error('Unexpected API response');
+      }
+      return data;
+    },
+  });
 
-  useEffect(() => {
-    const controller = new AbortController();
-    axios.get(url, { signal: controller.signal, timeout: 15000 })
-      .then(({ data }) => {
-        if (expectArray ? !Array.isArray(data) : !data || typeof data !== 'object' || Array.isArray(data)) {
-          throw new Error('Unexpected API response');
-        }
-        if (!controller.signal.aborted) setResult({ key, data, error: null });
-      })
-      .catch(error => {
-        if (!controller.signal.aborted) {
-          setResult({ key, data: null, error: error.response?.status === 404 ? 'not-found' : 'unavailable' });
-        }
-      });
-    return () => controller.abort();
-  }, [url, key, expectArray]);
-
-  const current = result?.key === key;
+  const notFound = query.error?.response?.status === 404;
+  const hasData = query.data !== undefined;
   return {
-    data: current ? result.data : null,
-    loading: !current,
-    error: current ? result.error : null,
-    retry: () => setAttempt(value => value + 1),
+    data: notFound ? null : query.data ?? null,
+    loading: !hasData && (query.isPending || query.isFetching),
+    // A failed background refresh should not hide previously loaded content.
+    error: notFound ? 'not-found' : !hasData && query.isError ? 'unavailable' : null,
+    retry: () => query.refetch(),
   };
 };

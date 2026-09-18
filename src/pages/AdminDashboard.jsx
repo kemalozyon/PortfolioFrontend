@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { invalidateContent } from '../lib/queryClient';
 import ProjectForm from '../components/ProjectForm';
 import BlogForm from '../components/BlogForm'; // BlogForm'u import ettik
 
@@ -135,6 +136,7 @@ const AdminDashboard = () => {
                         <button onClick={async () => {
                           if (window.confirm('Are you sure you want to delete this project?')) {
                             await axios.delete(`/api/projects/${p._id}`, { headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` } });
+                            await invalidateContent('projects', p._id);
                             fetchProjects();
                           }
                         }} className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 font-medium">Delete</button>
@@ -180,6 +182,7 @@ const AdminDashboard = () => {
                         <button onClick={async () => {
                           if (window.confirm('Are you sure you want to delete this blog post?')) {
                             await axios.delete(`/api/blogs/${b._id}`, { headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` } });
+                            await invalidateContent('blogs', b._id);
                             fetchBlogs();
                           }
                         }} className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 font-medium">Delete</button>

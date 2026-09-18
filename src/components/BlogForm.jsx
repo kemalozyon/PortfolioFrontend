@@ -1,6 +1,7 @@
 // frontend/src/components/BlogForm.jsx
 import { useState } from 'react';
 import axios from 'axios';
+import { invalidateContent } from '../lib/queryClient';
 
 const BlogForm = ({ editBlog, onComplete, onCancel }) => {
   const [title, setTitle] = useState(editBlog?.title || '');
@@ -54,6 +55,7 @@ const BlogForm = ({ editBlog, onComplete, onCancel }) => {
         });
       }
 
+      await invalidateContent('blogs');
       onComplete(); // Listeyi yenilemek için üst bileşene haber ver
     } catch (err) {
       console.error(err);

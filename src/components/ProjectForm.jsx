@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
+import { invalidateContent } from '../lib/queryClient';
 
 const ProjectForm = ({ editProject, onComplete, onCancel }) => {
   const [title, setTitle] = useState(editProject?.title || '');
@@ -55,6 +56,7 @@ const ProjectForm = ({ editProject, onComplete, onCancel }) => {
         });
       }
 
+      await invalidateContent('projects');
       onComplete(); // Listeyi yenilemek için üst bileşene haber ver
     } catch (err) {
       console.error(err);
