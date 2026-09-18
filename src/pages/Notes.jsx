@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useNotesData, folderPath, folderIsPrivate } from "../lib/notesApi";
 import NoteMarkdown from "../components/notes/NoteMarkdown";
@@ -7,10 +7,13 @@ import { useDocumentMeta } from "../hooks/useDocumentMeta";
 
 const Notes = () => {
   const { noteId, folderId } = useParams();
-  const admin = Boolean(localStorage.getItem("adminToken"));
-  const tree = useNotesData("/tree", { admin });
+  const [sessionRejected, setSessionRejected] = useState(false);
+  const onUnauthorized = useCallback(() => setSessionRejected(true), []);
+  const admin = Boolean(localStorage.getItem("adminToken")) && !sessionRejected;
+  const tree = useNotesData("/tree", { admin, onUnauthorized });
   const note = useNotesData(`/notes/${noteId}`, {
     admin,
+    onUnauthorized,
     enabled: Boolean(noteId),
   });
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -23,6 +26,7 @@ const Notes = () => {
   }, [search]);
   const searchRequest = useNotesData(`/tree?q=${encodeURIComponent(term)}`, {
     admin,
+    onUnauthorized,
     enabled: Boolean(term),
   });
   const folders = tree.data?.folders || [],

@@ -23,18 +23,25 @@ export const refreshNotes = async () => {
 };
 export const clearNotes = () =>
   queryClient.removeQueries({ queryKey: ["notes"] });
-export const useNotesData = (path, { admin = false, enabled = true } = {}) =>
+export const useNotesData = (path, { admin = false, enabled = true, onUnauthorized } = {}) =>
   useQuery({
     queryKey: ["notes", admin ? "admin" : "public", path],
     enabled,
     staleTime: admin ? 0 : 5 * 60 * 1000,
     gcTime: admin ? 0 : 30 * 60 * 1000,
+    retry: (failureCount, error) =>
+      ![401, 404].includes(error.response?.status) && failureCount < 2,
     queryFn: async ({ signal }) => {
-      const { data } = await axios.get(
-        `/api/notes${admin ? "/admin" : ""}${path}`,
-        { signal, headers: admin ? notesHeaders() : {}, timeout: 15000 },
-      );
-      return data;
+      try {
+        const { data } = await axios.get(
+          `/api/notes${admin ? "/admin" : ""}${path}`,
+          { signal, headers: admin ? notesHeaders() : {}, timeout: 15000 },
+        );
+        return data;
+      } catch (error) {
+        if (admin && error.response?.status === 401) onUnauthorized?.();
+        throw error;
+      }
     },
   });
 
