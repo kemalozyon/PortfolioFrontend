@@ -291,7 +291,7 @@ const AdminNotes = () => {
     setError("");
     try {
       if (!file || file.size > 4 * 1024 * 1024)
-        throw new Error("Choose a .md or ZIP file under 4 MB.");
+        throw new Error("Choose a .md, .ipynb or ZIP file under 4 MB.");
       const data = new FormData();
       data.append("file", file);
       data.append("folder", importFolder);
@@ -435,7 +435,7 @@ const AdminNotes = () => {
                     }}
                     className={buttonClass}
                   >
-                    Import .md / ZIP
+                    Import .md / .ipynb / ZIP
                   </button>
                 </div>
               </div>
@@ -446,8 +446,9 @@ const AdminNotes = () => {
                 >
                   <h3 className="text-xl font-semibold">Import a note</h3>
                   <p className="text-sm text-slate-400">
-                    One .md file, or a ZIP containing one .md and its relative
+                    A .md or .ipynb file, or a ZIP containing one .md and its relative
                     image files. Maximum upload: 4 MB. Expanded ZIP: 12 MB.
+                    Notebooks convert saved cells and outputs without executing code.
                     Imported notes start as drafts.
                   </p>
                   <fieldset disabled={busy} className="space-y-4">
@@ -456,7 +457,7 @@ const AdminNotes = () => {
                       <input
                         required
                         type="file"
-                        accept=".md,.zip"
+                        accept=".md,.ipynb,.zip"
                         onChange={(event) =>
                           setFile(event.target.files[0] || null)
                         }
