@@ -2,7 +2,7 @@
 
 The frontend for my personal portfolio site. A React 19 single-page app that renders public pages for projects and blog posts and a JWT-protected admin dashboard for managing content.
 
-The companion Express backend lives in the sibling `backend/` repo and is deployed separately on Vercel. Set `VITE_API_URL` to its origin (without `/api`). The browser and the sitemap/prerender build scripts use the same setting.
+The companion Express backend lives in the sibling `backend/` repo and runs on an Oracle Cloud server at `https://api.kemalozyon.com`. That origin is defined once in `src/lib/apiOrigin.js`; the browser and the sitemap/prerender build scripts all use it.
 
 ## Tech stack
 
@@ -61,17 +61,15 @@ The login page POSTs credentials to the backend and stores the returned JWT in `
 
 The site uses a permanent dark theme applied in `index.html` before first paint. The hero contains a lightweight SVG packet-routing animation; users who prefer reduced motion see the static network. Navigation details use monospace type while body text stays sans-serif.
 
-## Backend proxy
+## Backend
 
-In development, `vite.config.js` forwards `/api/*` to `VITE_API_URL`, falling back to `http://localhost:5000`. Run `npm run dev` in the sibling backend for local development. Set the frontend `.env` to the deployed backend origin to use production data instead, then restart Vite.
+All Axios calls go directly to `https://api.kemalozyon.com`, in development and production alike; there is no Vite proxy. The backend's CORS policy must allow the frontend's origin, including `http://localhost:5173` for local development.
 
 ## Deployment
 
 Build output lands in `dist/` and is a fully static bundle — deploy it to any static host (Vercel, Netlify, Cloudflare Pages, etc.). Make sure the host rewrites unknown paths to `index.html` so client-side routing works on direct URL hits.
 
-In the frontend Vercel project's Environment Variables, set `VITE_API_URL` to the backend's production origin, for example `https://your-backend.vercel.app`. Enable it for Production and Preview as needed, then redeploy. A missing or invalid origin fails the build. Production Axios calls go directly to that origin; the backend CORS policy must allow the frontend's origin. Preview frontend domains need their own CORS permission.
-
-`VITE_API_URL` is a public URL included in the browser bundle. Keep MongoDB, JWT, Cloudinary, and Resend secrets in the backend project only.
+No frontend environment variables are needed. Preview frontend domains need their own CORS permission on the backend. Keep MongoDB, JWT, Cloudinary, and Resend secrets in the backend only.
 
 ## Notes on authorship
 
